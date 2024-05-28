@@ -1,6 +1,23 @@
+const axios = require('axios');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const logger = require('../utils/logger');
+
+const checkConnection = async () => {
+    try {
+        await axios.get('https://www.google.com');
+        return true;
+    } catch (error) {
+        return false;
+    }
+};
+
+const initializeClient = async () => {
+    const connectionStatus = await checkConnection();
+    if (!connectionStatus) {
+        logger.error('No internet connection. Please check your network');
+    }
+};
 
 const waClient = new Client({
     authStrategy: new LocalAuth(),
@@ -27,6 +44,11 @@ waClient.on('message', async (msg) => {
     } catch (error) {
         logger.error(error.message);
     }
+});
+
+waClient.on('disconnected', (reason) => {
+    logger.error(`Client disconnected: ${reason}. Reconnecting...`);
+    initializeClient();
 });
 
 module.exports = waClient;
