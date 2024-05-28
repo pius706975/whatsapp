@@ -22,6 +22,7 @@ waClient.on('message', async (msg) => {
         if (msg.from !== 'status@broadcast') {
             const contact = await msg.getContact();
             console.log(contact, msg.body);
+            // logger.log(contact, msg.body);
         }
     } catch (error) {
         logger.error(error.message);
