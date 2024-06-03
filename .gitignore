@@ -27,6 +27,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+/session
 /logs
 /.wwebjs_auth
 /.vscode

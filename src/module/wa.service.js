@@ -1,9 +1,16 @@
-const axios = require('axios');
+const fs = require('fs');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
+const axios = require('axios');
 const logger = require('../utils/logger');
 
+// Session data directory
+const SESSION_DIR = './session';
 let waClient = null;
+
+if (fs.existsSync(SESSION_DIR)) {
+    fs.mkdirSync(SESSION_DIR, { recursive: true });
+}
 
 const checkConnection = async () => {
     try {
@@ -25,7 +32,9 @@ const initializeClient = async () => {
     if (!waClient) {
         try {
             waClient = new Client({
-                authStrategy: new LocalAuth(),
+                authStrategy: new LocalAuth({
+                    dataPath: SESSION_DIR,
+                }),
                 puppeteer: {
                     headless: true,
                     args: ['--no-sandbox', '--disable-gpu'],
@@ -39,6 +48,17 @@ const initializeClient = async () => {
 
             waClient.on('qr', (qr) => qrcode.generate(qr, { small: true }));
             waClient.on('ready', () => logger.info('Client is ready!'));
+
+            waClient.on('authenticated', () => {
+                logger.info('Authenticated successfully');
+                const session = fs.readdirSync(SESSION_DIR);
+                if (session.length > 0) {
+                    logger.info(`Session: ${session}`);
+                } else {
+                    logger.warn('No session found');
+                }
+            });
+
             waClient.on('message', async (msg) => {
                 try {
                     if (msg.from !== 'status@broadcast') {
@@ -57,8 +77,9 @@ const initializeClient = async () => {
             });
 
             logger.info('waClient initialized successfully');
+            await waClient.initialize();
         } catch (error) {
-            logger.error(error.message);
+            logger.error('Error initializing waClient:', error);
         }
     }
 };
@@ -66,7 +87,7 @@ const initializeClient = async () => {
 initializeClient();
 
 process.on('uncaughtException', (err) => {
-    logger.error(err);
+    logger.error('Uncaught exception:', err);
     initializeClient();
 });
 

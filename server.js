@@ -6,12 +6,9 @@ const cors = require('cors');
 const events = require('events');
 const logger = require('./src/utils/logger');
 const response = require('./src/utils/api.responses');
-const waClient = require('./src/module/wa.service');
 const waClientRouter = require('./src/module/wa.routes');
 
 events.EventEmitter.defaultMaxListeners = Infinity;
-
-waClient.initialize();
 
 const PORT = process.env.PORT || 1232;
 
