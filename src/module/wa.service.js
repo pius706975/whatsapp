@@ -35,9 +35,13 @@ const initializeClient = async () => {
                 authStrategy: new LocalAuth({
                     dataPath: SESSION_DIR,
                 }),
+                // puppeteer: {
+                //     headless: true,
+                //     args: ['--no-sandbox', '--disable-gpu'],
+                // },
                 puppeteer: {
                     headless: true,
-                    args: ['--no-sandbox', '--disable-gpu'],
+                    args: ['--no-sandbox', '--disable-setuid-sandbox'],
                 },
                 webVersionCache: {
                     type: 'remote',

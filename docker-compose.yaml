@@ -1,0 +1,10 @@
+version: '3'
+services:
+ Be: 
+   image: lectronic/be:1
+   working_dir: /app
+   container_name: be
+   volumes:
+     - ./:/app
+   ports:
+     - 1233:1232
